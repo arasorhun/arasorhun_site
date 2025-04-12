@@ -1,0 +1,19 @@
+
+body { font-family: sans-serif; margin: 40px; }
+.post { margin-bottom: 20px; }
+.quotes {
+    position: fixed;
+    width: 120px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-style: italic;
+    opacity: 0.4;
+    animation: scroll 10s linear infinite;
+}
+.left { left: 0; top: 0; }
+.right { right: 0; bottom: 0; }
+
+@keyframes scroll {
+    0% { transform: translateY(100%); }
+    100% { transform: translateY(-100%); }
+}

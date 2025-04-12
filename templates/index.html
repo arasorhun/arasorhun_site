@@ -1,0 +1,21 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aras Orhun</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="quotes left">"Bilgi güçtür."</div>
+<div class="quotes right">"Söz uçar, yazı kalır."</div>
+
+<h1>Aras Orhun - Makaleler</h1>
+{% for post in posts %}
+    <div class="post">
+        <h2><a href="/yazi/{{ post[0] }}">{{ post[1] }}</a></h2>
+        <small>{{ post[3] }}</small>
+    </div>
+{% endfor %}
+<a href="/yazar">Yazar Hakkında</a>
+</body>
+</html>

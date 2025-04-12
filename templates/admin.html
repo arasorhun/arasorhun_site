@@ -1,0 +1,21 @@
+
+<!DOCTYPE html>
+<html>
+<head><title>Yönetim Paneli</title><link rel="stylesheet" href="/static/style.css"></head>
+<body>
+<h1>Yazı Ekle</h1>
+<form method="post">
+    <input type="text" name="title" placeholder="Başlık"><br>
+    <textarea name="content" placeholder="İçerik"></textarea><br>
+    <button type="submit">Kaydet</button>
+</form>
+<h2>Mevcut Yazılar</h2>
+{% for post in posts %}
+    <div class="post">
+        <h3>{{ post[1] }}</h3>
+        <a href="/delete/{{ post[0] }}">Sil</a> | <a href="/yazi/{{ post[0] }}">Görüntüle</a>
+    </div>
+{% endfor %}
+<a href="/logout">Çıkış Yap</a>
+</body>
+</html>
