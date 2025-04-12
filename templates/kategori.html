@@ -1,0 +1,12 @@
+
+<!DOCTYPE html>
+<html><head><title>{{ kategori }}</title><link rel="stylesheet" href="/static/style.css"></head>
+<body>
+<a href="/">← Anasayfa</a>
+<h1>Kategori: {{ kategori }}</h1>
+<ul>
+{% for post in posts %}
+    <li><a href="/yazi/{{ post['id'] }}">{{ post['title'] }}</a> ({{ post['created_at'] }})</li>
+{% endfor %}
+</ul>
+</body></html>

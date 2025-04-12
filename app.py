@@ -2,40 +2,34 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from datetime import datetime
 import sqlite3
+import os
 
 app = Flask(__name__)
 app.secret_key = 'gizli-anahtar'
 
-def init_db():
-    with sqlite3.connect('arasorhun.db') as conn:
-        c = conn.cursor()
-        c.execute('''CREATE TABLE IF NOT EXISTS posts (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        title TEXT,
-                        content TEXT,
-                        created_at TEXT
-                    )''')
-        c.execute('''CREATE TABLE IF NOT EXISTS admin (
-                        username TEXT,
-                        password TEXT
-                    )''')
-        conn.commit()
-        c.execute("SELECT * FROM admin")
-        if not c.fetchall():
-            c.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ("admin", "1234"))
-            conn.commit()
+def get_db_connection():
+    conn = sqlite3.connect('arasorhun.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+@app.route('/')
+def index():
+    conn = get_db_connection()
+    posts = conn.execute('SELECT * FROM posts ORDER BY id DESC').fetchall()
+    conn.close()
+    return render_template('index.html', posts=posts)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        with sqlite3.connect('arasorhun.db') as conn:
-            c = conn.cursor()
-            c.execute("SELECT * FROM admin WHERE username=? AND password=?", (username, password))
-            if c.fetchone():
-                session['admin'] = True
-                return redirect(url_for('admin'))
+        conn = get_db_connection()
+        admin = conn.execute('SELECT * FROM admin WHERE username = ? AND password = ?', (username, password)).fetchone()
+        conn.close()
+        if admin:
+            session['admin'] = True
+            return redirect(url_for('admin'))
     return render_template('login.html')
 
 @app.route('/logout')
@@ -47,54 +41,47 @@ def logout():
 def admin():
     if not session.get('admin'):
         return redirect(url_for('login'))
-    with sqlite3.connect('arasorhun.db') as conn:
-        c = conn.cursor()
-        if request.method == 'POST':
-            title = request.form['title']
-            content = request.form['content']
-            c.execute("INSERT INTO posts (title, content, created_at) VALUES (?, ?, ?)",
-                      (title, content, datetime.now().strftime("%Y-%m-%d %H:%M")))
-            conn.commit()
-        c.execute("SELECT * FROM posts ORDER BY id DESC")
-        posts = c.fetchall()
+    conn = get_db_connection()
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        category = request.form['category']
+        created_at = datetime.now().strftime('%Y-%m-%d %H:%M')
+        conn.execute('INSERT INTO posts (title, content, created_at, category) VALUES (?, ?, ?, ?)',
+                     (title, content, created_at, category))
+        conn.commit()
+    posts = conn.execute('SELECT * FROM posts ORDER BY id DESC').fetchall()
+    conn.close()
     return render_template('admin.html', posts=posts)
 
 @app.route('/delete/<int:id>')
 def delete(id):
     if not session.get('admin'):
         return redirect(url_for('login'))
-    with sqlite3.connect('arasorhun.db') as conn:
-        c = conn.cursor()
-        c.execute("DELETE FROM posts WHERE id=?", (id,))
-        conn.commit()
+    conn = get_db_connection()
+    conn.execute('DELETE FROM posts WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
     return redirect(url_for('admin'))
-
-@app.route('/')
-def index():
-    with sqlite3.connect('arasorhun.db') as conn:
-        c = conn.cursor()
-        c.execute("SELECT * FROM posts ORDER BY id DESC")
-        posts = c.fetchall()
-    return render_template('index.html', posts=posts)
 
 @app.route('/yazi/<int:id>')
 def yazi(id):
-    with sqlite3.connect('arasorhun.db') as conn:
-        c = conn.cursor()
-        c.execute("SELECT * FROM posts WHERE id=?", (id,))
-        post = c.fetchone()
+    conn = get_db_connection()
+    post = conn.execute('SELECT * FROM posts WHERE id = ?', (id,)).fetchone()
+    conn.close()
     return render_template('yazi.html', post=post)
+
+@app.route('/kategori/<kategori_adi>')
+def kategori(kategori_adi):
+    conn = get_db_connection()
+    posts = conn.execute('SELECT * FROM posts WHERE category = ? ORDER BY id DESC', (kategori_adi,)).fetchall()
+    conn.close()
+    return render_template('kategori.html', kategori=kategori_adi, posts=posts)
 
 @app.route('/yazar')
 def yazar():
     return render_template('yazar.html')
 
 if __name__ == '__main__':
-    init_db()
-    import os
-
-if __name__ == '__main__':
-    init_db()
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
-

@@ -12,7 +12,6 @@ body { font-family: sans-serif; margin: 40px; }
 }
 .left { left: 0; top: 0; }
 .right { right: 0; bottom: 0; }
-
 @keyframes scroll {
     0% { transform: translateY(100%); }
     100% { transform: translateY(-100%); }
