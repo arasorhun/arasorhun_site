@@ -1,15 +1,1 @@
-
-<!DOCTYPE html>
-<html><head><title>Aras Orhun</title><link rel="stylesheet" href="/static/style.css"></head>
-<body>
-<div class="quotes left">"Bilgi güçtür."</div>
-<div class="quotes right">"Söz uçar, yazı kalır."</div>
-
-<h1>Aras Orhun - Makaleler</h1>
-<ul>
-{% for post in posts %}
-    <li><a href="/yazi/{{ post['id'] }}">{{ post['title'] }}</a> ({{ post['category'] }})</li>
-{% endfor %}
-</ul>
-<a href="/yazar">Yazar Hakkında</a>
-</body></html>
+<h1>Kategorilere Göre Yazılar</h1>{% for post in posts %}<p><a href='/yazi/{{post.id}}'>{{post.title}}</a> - {{post.category}}</p>{% endfor %}

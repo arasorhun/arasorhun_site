@@ -1,18 +1,1 @@
-
-<!DOCTYPE html>
-<html><head><title>Yönetim Paneli</title><link rel="stylesheet" href="/static/style.css"></head>
-<body>
-<h1>Yeni Yazı Ekle</h1>
-<form method="post">
-    <input type="text" name="title" placeholder="Başlık"><br>
-    <textarea name="content" placeholder="İçerik"></textarea><br>
-    <input type="text" name="category" placeholder="Kategori"><br>
-    <button type="submit">Kaydet</button>
-</form>
-<hr>
-<h2>Mevcut Yazılar</h2>
-{% for post in posts %}
-    <p><a href="/yazi/{{ post['id'] }}">{{ post['title'] }}</a> ({{ post['category'] }}) — <a href="/delete/{{ post['id'] }}">Sil</a></p>
-{% endfor %}
-<a href="/logout">Çıkış</a>
-</body></html>
+<form method='post'><input name='title'><textarea name='content'></textarea><input name='category'><button>Kaydet</button></form><hr>{% for post in posts %}<p>{{post.title}}</p>{% endfor %}
